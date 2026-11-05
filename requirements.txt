@@ -1,11 +1,29 @@
+# Web / API
 fastapi
 uvicorn
 gradio
 pydantic
-langchain_openai
-langchain
-codeboxapi
-requests
 python-dotenv
+requests
+typing-extensions
+
+# Agent 编排
+langchain
+langchain-core
+langchain-openai
+langgraph
+
+# 检索与向量库
+langchain-community
+langchain-text-splitters
+langchain-chroma
+chromadb
+
+# 元数据与文档解析
+sqlalchemy
+pymupdf
+
+# 工具
+codeboxapi
 ipython
 matplotlib
