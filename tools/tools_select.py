@@ -13,7 +13,7 @@ from tools.get_time import get_time
 # 1. 天气工具
 # =========================
 class WeatherInput(BaseModel):
-    city: str = Field(description="城市名", example="北京")
+    city: str = Field(description="城市名", json_schema_extra={"example": "北京"})
 
 def weather_func(city: str):
     return weather_check.run(city)

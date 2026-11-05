@@ -1,5 +1,8 @@
 import os
-import fitz
+try:  # PyMuPDF >=1.24 推荐用 pymupdf 包名，旧版本回退到 fitz 别名
+    import pymupdf as fitz
+except ImportError:  # pragma: no cover
+    import fitz
 from fastapi import HTTPException
 from langchain_core.documents import Document
 

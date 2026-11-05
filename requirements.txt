@@ -23,7 +23,9 @@ chromadb
 sqlalchemy
 pymupdf
 
-# 工具
+# 工具（本地代码解释器走 jupyter kernel）
 codeboxapi
 ipython
+ipykernel
+jupyter-client
 matplotlib

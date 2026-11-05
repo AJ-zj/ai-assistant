@@ -28,6 +28,9 @@ def get_embedding() -> OpenAIEmbeddings:
                 "SILICONFLOW_BASE_URL", "https://api.siliconflow.cn/v1"
             ),
             model="BAAI/bge-large-zh-v1.5",
+            # 默认会用 tiktoken 把文本编码成 token-id 数组发到 /embeddings，
+            # SiliconFlow 只接受字符串数组，否则返回 400。
+            check_embedding_ctx_length=False,
         )
     return _embedding
 
