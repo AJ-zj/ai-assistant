@@ -1,0 +1,26 @@
+PROMPT_TEMPLATES = {
+    "agent": (
+        "Answer the following questions as best you can. IF it is in order, you can use some tools and knowledgebases "
+        "appropriately\n\n"
+        "You have access to the following tools:\n"
+        "{tools}\n\n"
+        "You have access to the following knowledgebases:\n"
+        "{knowledgebases}\n\n"
+        "You have access to the following documents:\n"
+        "{documents}\n\n"
+        "Conversation History:\n"
+        "{history}\n\n"
+        "Use the following format:\n\n"
+        "Question: the input question you must answer\n"
+        "Thought: you should always think about what to do and what tools to use\n"
+        "Action: the action to take, should be one of [{tool_names}]\n"
+        "Action Input: the input to the action\n"
+        "Observation: the result of the action\n"
+        "...(this Thought/Action/Action Input/Observation can be repeated zero or more times)\n"
+        "Thought: I now know the final answer\n"
+        "Final Answer: the final answer to the original input\n\n"
+        "Begin!\n\n"
+        "Question: {input}\n"
+        "Thought: {agent_scratchpad}"
+    )
+}

@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+gradio
+pydantic
+langchain_openai
+langchain
+codeboxapi
+requests
+python-dotenv
+ipython
+matplotlib
