@@ -106,4 +106,4 @@ python webui.py           # 前端 http://127.0.0.1:7900
 
 ## License
 
-MIT
+CC0 1.0 Universal（见 [LICENSE](LICENSE)）
