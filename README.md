@@ -9,7 +9,7 @@
 | 模块 | 能力 |
 |---|---|
 | Agent 编排 | LangGraph `StateGraph`：`bind_tools` 结构化工具调用、`tools_condition` 条件路由、`ToolNode` 执行与结果回灌 |
-| 工具集 | 5 个 `StructuredTool`：知识库检索、联网搜索、代码解释器、天气、时间 |
+| 工具集 | 5 个 `StructuredTool`：知识库检索、联网搜索、代码解释器、天气、时间；联网搜索支持「国内 API → 兼容 API → 免 key 结果页」三通道自动降级 |
 | 代码解释器 | 独立 worker 线程中按需启动本地 CodeBox，不占用 FastAPI 的事件循环；异常降级为可读文本，不影响其余 4 个工具 |
 | 知识库管理 | 创建 / 删除，上传 PDF / TXT / CSV / MD；扩展名白名单 + 文件名非法字符校验 |
 | 文档摄入 | `RecursiveCharacterTextSplitter` 按可配置 `chunk_size` / `overlap` 切片，BGE-large-zh-v1.5 向量化写入 Chroma |
@@ -83,8 +83,11 @@ python webui.py           # 前端 http://127.0.0.1:7900
 | `SILICONFLOW_API_KEY` | 对话模型 / Embedding 共用密钥（必填） | — |
 | `SILICONFLOW_BASE_URL` | OpenAI 兼容接口地址 | `https://api.siliconflow.cn/v1` |
 | `CHAT_MODEL` | 对话模型，**需支持 function calling / tool calling** | `deepseek-ai/DeepSeek-V3` |
-| `SERPAPI_API_KEY` | 联网搜索工具（可选） | — |
+| `BOCHA_API_KEY` | 联网搜索首选通道：博查 Web Search API（国内，可选） | — |
+| `SERPAPI_API_KEY` | 联网搜索兼容通道：SerpAPI（海外，可选） | — |
 | `SENIVERSE_API_KEY` | 天气工具（可选） | — |
+
+> 联网工具按「博查 → SerpAPI → Bing 结果页（免 key）」自动降级：两个 Key 都不填也能联网，只是走免 key 通道；配置了国内 Key 则优先使用博查的结构化结果。任一通道失败会落到下一个，不会中断 Agent 链路。Key 在每次调用时读取，补填 `.env` 后无需重启服务。
 
 知识库切片参数（`/knowledgebase/upload_docs` 表单）：`chunk_size` 默认 128（64–1024）、`overlap` 默认 20（0–200）。BGE 系列模型有 512 token 上限，切片不宜过大。
 
@@ -122,8 +125,9 @@ python -m venv .venv
 | 工具调用 | 连续 3 次「现在几点」均触发 `get_time`，SSE 出现 `[调用工具]` 轨迹，回答时间与本机时钟一致 |
 | 知识库链路 | 创建知识库 → 上传 txt → BGE 向量化写入 Chroma → 提问触发 `knowledge_search` → 回答命中文档中的口令并标注「知识库名｜来源文件」→ 删除知识库清理 |
 | Embedding | `/embeddings` 返回 1024 维向量；`embed_query` / `embed_documents` 均可用 |
+| 联网搜索（免 key 通道） | 未配置任何搜索 Key 时，实时信息类提问触发 `web_search`，自动降级到 Bing 结果页解析，返回 5 条标题 / 摘要 / 链接，结果带 `[搜索来源：…]` |
 
-这一步需要真实模型与 API Key，本仓库不提供凭据。
+这一步需要真实模型与 API Key（对话侧），本仓库不提供凭据；联网搜索的免 key 通道不依赖任何 Key。
 
 ## 当前状态与 Roadmap
 
@@ -143,7 +147,7 @@ python -m venv .venv
 3. 暂无离线评测集，`tests/` 覆盖 Agent Loop 编排、向量库增删查与工具导入回归，不代表端到端效果指标。
 4. 会话历史由前端传入，服务端不做持久化；多实例部署时会话不共享。
 5. `code_interpreter` 在进程内执行 Python，未做沙箱隔离，仅建议本地单用户使用；现已改为独立 worker 线程按需启动，避免与 FastAPI 事件循环冲突。
-6. 联网搜索与天气工具依赖外部 API，未配置 Key 时会返回调用异常，不影响其余工具。
+6. 联网搜索优先走国内博查 API；未配置 Key 时降级为解析 Bing 结果页（免 key），页面结构变动或反爬会导致该兜底通道失效。天气工具仍依赖心知天气 Key，未配置时返回调用异常，不影响其余工具。
 7. 前端 Gradio 只在使用 `webui.py` 时需要，后端服务启动不依赖它。
 
 ## 安全说明
