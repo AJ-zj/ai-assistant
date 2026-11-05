@@ -14,7 +14,7 @@ from langchain_openai import OpenAIEmbeddings
 
 from config.setting import KB_DIR
 
-COLLECTION_NAME = "kb"
+COLLECTION_NAME = "kb_docs"  # Chroma 要求 3-512 字符、仅 [a-zA-Z0-9._-]
 _embedding = None
 
 

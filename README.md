@@ -91,11 +91,16 @@ python webui.py           # 前端 http://127.0.0.1:7900
 
 ```bash
 python -m venv .venv
-.venv/Scripts/python -m pip install langgraph langchain-core pydantic
+.venv/Scripts/python -m pip install -r requirements.txt   # 最小集合：langgraph langchain-core pydantic
 .venv/Scripts/python -m unittest discover -s tests -v
 ```
 
-单测用脚本化假模型 + 无副作用的 `echo` 工具，断言四件事：模型产出 `tool_calls` 时确实路由到 `ToolNode` 并执行工具；`ToolMessage` 回灌后再次进入 agent 节点；无 `tool_calls` 时图直接结束；System Prompt 被注入首轮消息。
+| 测试 | 验证内容 | 额外依赖 |
+|---|---|---|
+| `tests/test_agent_loop.py` | 脚本化假模型 + 无副作用 echo 工具：模型产出 `tool_calls` 时路由到 `ToolNode` 并执行、`ToolMessage` 回灌后再次进入 agent、无 `tool_calls` 时直接结束、System Prompt 注入首轮消息 | 无 |
+| `tests/test_vector_store.py` | 临时目录 + `FakeEmbeddings` 实测 Chroma 的写入、按库检索、跨库检索、按来源删除 | `langchain-chroma` / `chromadb`（未安装则自动跳过） |
+
+两个测试都不联网、不需要任何真实 API Key，也不在仓库内留下索引文件。
 
 ## 端到端跑一次工具调用（需要 Key）
 
